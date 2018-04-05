@@ -131,8 +131,8 @@ class TerraStateApi(Flask):
         Flask.__init__(self, name)
 
         dhc_view = StateView.as_view('status')
-        self.add_url_rule('state/', defaults={'env': None}, view_func=dhc_view)
-        self.add_url_rule('state/<env>', view_func=dhc_view, methods=['GET', 'POST', 'DELETE', 'LOCK', 'UNLOCK'])
+        self.add_url_rule('/state/', defaults={'env': None}, view_func=dhc_view)
+        self.add_url_rule('/state/<env>', view_func=dhc_view, methods=['GET', 'POST', 'DELETE', 'LOCK', 'UNLOCK'])
 
         # add custom error handler
         for code in default_exceptions.iterkeys():
@@ -156,7 +156,9 @@ app = TerraStateApi(__name__)
 
 @app.route('/ssh_keys')
 def get_public_ssh_keys():
-    r = Response(response="TEST OK", status=200, mimetype="application/xml")
+    with open('keys.txt', 'r') as infile:
+        response_text = infile.read()
+    r = Response(response=response_text, status=200, mimetype="application/xml")
     r.headers["Content-Type"] = "text/plain; charset=utf-8"
     return r
 
