@@ -10,6 +10,7 @@ from os.path import join
 from flask import Flask
 from flask import request
 from flask import jsonify
+from flask import Response
 from flask.views import MethodView
 
 from werkzeug.exceptions import default_exceptions
@@ -130,8 +131,8 @@ class TerraStateApi(Flask):
         Flask.__init__(self, name)
 
         dhc_view = StateView.as_view('status')
-        self.add_url_rule('/', defaults={'env': None}, view_func=dhc_view)
-        self.add_url_rule('/<env>', view_func=dhc_view, methods=['GET', 'POST', 'DELETE', 'LOCK', 'UNLOCK'])
+        self.add_url_rule('state/', defaults={'env': None}, view_func=dhc_view)
+        self.add_url_rule('state/<env>', view_func=dhc_view, methods=['GET', 'POST', 'DELETE', 'LOCK', 'UNLOCK'])
 
         # add custom error handler
         for code in default_exceptions.iterkeys():
@@ -152,6 +153,12 @@ class TerraStateApi(Flask):
 
 
 app = TerraStateApi(__name__)
+
+@app.route('/ssh_keys')
+def get_public_ssh_keys():
+    r = Response(response="TEST OK", status=200, mimetype="application/xml")
+    r.headers["Content-Type"] = "text/plain; charset=utf-8"
+    return r
 
 if __name__ == '__main__':
     app.run(debug=False, host='0.0.0.0')
