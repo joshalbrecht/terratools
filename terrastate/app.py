@@ -3,6 +3,8 @@
 import os
 import json
 import errno
+from uuid import UUID
+import hashlib
 
 from os.path import dirname
 from os.path import join
@@ -53,6 +55,9 @@ class TerraformState(dict):
 
     def load(self):
         if not os.path.isfile(self._getstatefilename(self.env)):
+            sha1 = hashlib.sha1()
+            sha1.update(self.env)
+            self.update({'lineage': str(UUID(bytes=sha1.digest()[:16], version=5))})
             return
         with open(self._getstatefilename(self.env)) as fh:
             self.update(json.load(fh))
